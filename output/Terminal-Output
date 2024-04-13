@@ -1,0 +1,15 @@
+initial array(Not optimal)
+3 2 8 1 0 0 
+0 10 4 0 1 0 
+0 5 5 0 0 1 
+
+ 
+final array(Optimal solution)
+1 0 2.4 0.333333 -0.0666667 0 
+0 1 0.4 0 0.1 0 
+0 0 3 0 -0.5 1 
+
+Answers for the Constraints of variables
+variable 1: 0.266667
+variable 2: 0.1
+variable 3: 0
