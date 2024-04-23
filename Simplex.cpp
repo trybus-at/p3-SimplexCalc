@@ -15,15 +15,14 @@ private:
     vector<float> B;
     // Stores the coefficients of the objective function
     vector<float> C;
-
-    vector <char> variable_name;
+    int k;
 
     float maximum;
 
     bool isUnbounded;
 
 public:
-    Simplex(vector<vector<float> > matrix, vector<float> b, vector<float> c)
+    Simplex(vector<vector<float> > matrix, vector<float> b, vector<float> c, int k_in)
     {
         maximum = 0;
         isUnbounded = false;
@@ -32,6 +31,7 @@ public:
         A.resize(rows, vector<float>(cols, 0));
         B.resize(b.size());
         C.resize(c.size());
+        k = k_in;
 
         for (int i = 0; i < rows; i++)
         { // Pass A[][] values to the matrix
@@ -54,7 +54,7 @@ public:
     bool simplexAlgorithmCalculataion()
     {
         // Check whether the table is optimal, if optimal no need to process further
-        if (checkOptimality() == true)
+        if (checkOptimality())
         {
             return true;
         }
@@ -62,7 +62,7 @@ public:
         // Find the column which has the pivot. The least coefficient of the objective function(C array).
         int pivotColumn = findPivotColumn();
 
-        if (isUnbounded == true)
+        if (isUnbounded)
         {
             cout << "Error unbounded" << endl;
             return true;
@@ -106,8 +106,6 @@ public:
 
         float pivetValue = A[pivotRow][pivotColumn]; // Gets the pivot value
 
-        
-
         float pivotRowVals[cols]; // The column with the pivot
 
         float pivotColVals[rows]; // The row with the pivot
@@ -144,8 +142,6 @@ public:
                 {
                     float multiplyValue = pivotColVals[m];
                     A[m][p] = A[m][p] - (multiplyValue * rowNew[p]);
-                    // C[p] = C[p] - (multiplyValue*C[pivotRow]);
-                    // B[i] = B[i] - (multiplyValue*B[pivotRow]);
                 }
             }
         }
@@ -189,7 +185,7 @@ public:
         cout << "" << endl;
     }
 
-    // Find the least coefficients of constraints in the objective function's position
+    // Find smallest constraint coefficients in the objective function's position
     int findPivotColumn()
     {
 
@@ -213,7 +209,7 @@ public:
     {
         float positiveValues[rows];
         vector<float> result(rows, 0);
-        // Float result[rows];
+
         int negativeValueCount = 0;
 
         for (int i = 0; i < rows; i++)
@@ -271,24 +267,24 @@ public:
     {
         bool end = false;
 
-        cout << "initial array(Not optimal)" << endl;
+        cout << "Initial array (not optimal):" << endl;
         print();
 
-        cout << " " << endl;
-        cout << "final array(Optimal solution)" << endl;
+        cout << "Final array (optimal solution)" << endl;
 
         while (!end)
         {
 
             bool result = simplexAlgorithmCalculataion();
 
-            if (result == true)
+            if (result)
             {
 
                 end = true;
             }
         }
-        cout << "Answers for the Constraints of variables" << endl;
+        cout << "Optimal column strategy:" << endl;
+        cout << "[ ";
 
         for (int i = 0; i < A.size(); i++)
         { // every basic column has the values, get it form B array
@@ -309,35 +305,36 @@ public:
             if (count0 == rows - 1)
             {
 
-                cout << "variable " << abs(index + 1) << ": " << B[index] << endl; // every basic column has the values, get it form B array
+                cout  << B[index] / maximum << " "; // every basic column has the values, get it form B array
             }
             else
             {
-                cout << "variable " << abs(index - 3) << ": " << 0 << endl;
+                cout << 0 << " ";
             }
         }
 
-        cout << "" << endl;
-        // cout << "maximum value: " << maximum << endl; // print the maximum values
+        cout << "]^T" << endl << endl;
+        cout << "value of the game: " << -1 * (1 / maximum - static_cast<double>(k)) << endl;
     }
 };
 
 int main()
 {
 
-    int colSizeA = 6; // should initialise columns size in A
-    int rowSizeA = 3; // should initialise columns row in A[][] vector
+    int colSizeA = 6; // set column size in A[][] matrix
+    int rowSizeA = 3; // set row size in A[][] matrix
 
-    float C[] = {-1, -1, -1, 0, 0, 1}; // should initialis the c arry here
-    float B[] = {1, 1, 1, 0};       // should initialis the b array here
+    float C[] = {-1, -1, -1, 0, 0, 1}; // represents the objective funtion
+    float B[] = {1, 1, 1, 0};       // represents the right side of constraint inequalities
 
-    float a[3][6] = {// should intialis the A[][] array here
+    float a[3][6] = {// initialize the A[][] array here
                      {3, 2, 8, 1, 0, 0},
                      {0, 10, 4, 0, 1, 0},
-                     {0, 5, 5, 0, 0, 1},
-                     };
+                     {0, 5, 5, 0, 0, 1}};
 
     vector<vector<float> > vec2D(rowSizeA, vector<float>(colSizeA, 0));
+    
+    int k = 5; // value added to all entries
 
     vector<float> b(rowSizeA, 0);
     vector<float> c(colSizeA, 0);
@@ -360,8 +357,8 @@ int main()
         c[i] = C[i];
     }
 
-    // hear the make the class parameters with A[m][n] vector b[] vector and c[] vector
-    Simplex simplex(vec2D, b, c);
+    // here make the class parameters with A[m][n] vector b[] vector and c[] vector
+    Simplex simplex(vec2D, b, c, k);
     simplex.CalculateSimplex();
 
     return 0;
